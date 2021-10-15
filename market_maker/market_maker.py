@@ -132,6 +132,11 @@ class ExchangeInterface:
             symbol = self.symbol
         return self.bitmex.instrument(symbol)
 
+    def http_open_orders(self, status=None, orderID=None):
+        if self.dry_run:
+            return []
+        return self.bitmex.http_open_orders(status, orderID)
+
     def get_margin(self):
         if self.dry_run:
             return {'marginBalance': float(settings.DRY_BTC), 'availableFunds': float(settings.DRY_BTC)}

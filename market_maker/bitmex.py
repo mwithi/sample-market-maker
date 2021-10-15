@@ -183,13 +183,20 @@ class BitMEX(object):
         return self.ws.open_orders(self.orderIDPrefix)
 
     @authentication_required
-    def http_open_orders(self):
+    def http_open_orders(self, status=None, orderID=None):
         """Get open orders via HTTP. Used on close to ensure we catch them all."""
         path = "order"
+        order_filter = {'ordStatus.isTerminated': False, 'symbol': self.symbol}
+        if status:
+            order_filter = {'ordStatus': status, 'symbol': self.symbol}
+        if orderID:
+            order_filter = {'orderID': orderID, 'symbol': self.symbol}
+        if status and orderID:
+            order_filter = {'ordStatus': status, 'orderID': orderID, 'symbol': self.symbol}
         orders = self._curl_bitmex(
             path=path,
             query={
-                'filter': json.dumps({'ordStatus.isTerminated': False, 'symbol': self.symbol}),
+                'filter': json.dumps(order_filter),
                 'count': 500
             },
             verb="GET"
